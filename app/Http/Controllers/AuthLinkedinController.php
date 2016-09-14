@@ -28,7 +28,7 @@ class AuthLinkedinController extends Controller
      */
     public function getUser()
     {
-        $$user = Socialite::driver('linkedin')->user();
+        $user = Socialite::driver('linkedin')->user();
         dd($user);
 
         // $user->token;
