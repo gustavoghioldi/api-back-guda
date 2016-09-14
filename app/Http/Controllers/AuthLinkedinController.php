@@ -17,7 +17,10 @@ class AuthLinkedinController extends Controller
     public function getLoginUrl()
     {
         $link =  Socialite::with('linkedin');
-        return $link->redirect()->getTargetUrl();
+        $url = $link->redirect()->getTargetUrl();
+        return response()->json(["data"=>$url], 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
         
     }
 
