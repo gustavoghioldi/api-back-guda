@@ -17,11 +17,12 @@ class AuthLinkedinController extends Controller
     public function getLoginUrl()
     {
         $link =  Socialite::with('linkedin');
-        $url = $link->redirect()->getTargetUrl();
+        //$link->redirectUrl("http://localhost:8888");
+        $url = $link->stateless()->redirect()->getTargetUrl();
         return response()->json(["data"=>$url], 200)
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        
+
     }
 
     /**
@@ -31,8 +32,13 @@ class AuthLinkedinController extends Controller
      */
     public function getUser()
     {
-        $user = Socialite::driver('linkedin')->user();
-        dd($user);
+
+        $connector = Socialite::driver('linkedin')->stateless();
+        //$connector->redirectUrl("http://localhost:8000");
+        $user = $connector->user();
+        return response()->json($user, 200)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Ac  cess-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
         // $user->token;
     }
