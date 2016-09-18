@@ -19,9 +19,7 @@ class AuthLinkedinController extends Controller
         $link =  Socialite::with('linkedin');
         //$link->redirectUrl("http://localhost:8888");
         $url = $link->stateless()->redirect()->getTargetUrl();
-        return response()->json(["data"=>$url], 200)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        return response()->json(["data"=>$url], 200);
 
     }
 
@@ -36,10 +34,32 @@ class AuthLinkedinController extends Controller
         $connector = Socialite::driver('linkedin')->stateless();
         //$connector->redirectUrl("http://localhost:8000");
         $user = $connector->user();
-        return response()->json($user, 200)
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Ac  cess-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        $mc = $this->getMonogoConnector("users");
+        
+        
+        $mongoUser =$mc->findOne(["id"=>$user->id]);
+        
+        if ($mongoUser==null){
+            $mc->insertOne($user->user);
+        }
 
-        // $user->token;
+        $mcs = $this->getMonogoConnector("session");
+        $mongoSession = $mcs->findOne(["userId"=>$user->id]);
+        
+        if ($mongoSession==null){
+            $mcs->insertOne(["userId"=>$user->id,"token"=>$user->token, "register"=>date("ymdhis")]);
+        }else {
+            $mcs->updateOne(["userId"=>$user->id], ['$set'=>["token"=>$user->token,"register"=>date("ymdhis")]]);
+        }
+        
+
+        return response()->json($user, 200);
+
+        
+    }
+
+    private function getMonogoConnector($collectionName){
+        $manager = new \MongoDB\Driver\Manager("mongodb://localhost:27017");
+        return  new \MongoDB\Collection($manager, "phplib_demo", $collectionName);
     }
 }

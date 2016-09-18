@@ -19,3 +19,6 @@ Route::get('/', function () {
 Route::get('/', "AuthLinkedinController@getUser");
 
 Route::get('/login', "AuthLinkedinController@getLoginUrl");
+
+Route::get('/prueba', "PruebaController@index");
+
